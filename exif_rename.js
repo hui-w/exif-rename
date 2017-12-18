@@ -1,4 +1,4 @@
-// Rename photos with the date time info in the exif
+// To rename photos with exif date time
 
 const fs = require('fs');
 const path = require('path');
