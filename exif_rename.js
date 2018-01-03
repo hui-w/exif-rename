@@ -34,21 +34,6 @@ class ExifRename {
     });
   }
 
-  // Process the file
-  processFile(pathName) {
-    return new Promise((resolve, reject) => {
-      this.statFile(pathName).then(stats => {
-        if (stats.isFile()) {
-          this.getNameByExif(pathName, stats.ctime);
-        } else if (stats.isDirectory()) {
-          this.processFolder(pathName);
-        }
-      }).catch(err => {
-        throw err;
-      })
-    });
-  }
-
   // Process the folder
   processFolder(folderPath) {
     return this.readFolder(folderPath).then(fileNames => {
@@ -57,7 +42,7 @@ class ExifRename {
           this.statFile(pathName)
             .then(stats => {
               if (stats.isFile()) {
-                this.processFile(pathName);
+                this.processFile(folderPath, fileName);
               } else if (stats.isDirectory()) {
                 this.processFolder(pathName);
               }
@@ -69,31 +54,61 @@ class ExifRename {
       });
   }
 
-  getNameByExif(filePathName, fileCreateTime) {
-    if (!/\.(jpg|jpeg|JPG|JPEG)$/.test(filePathName)) {
-      return;
+  // Process the file
+  processFile(folderPath, fileName) {
+    return new Promise((resolve, reject) => {
+      const pathName = path.join(folderPath, fileName);
+      this.statFile(pathName).then(stats => {
+        if (stats.isFile()) {
+          this.getNameByExif(folderPath, fileName, stats.ctime).then(newName => {
+            const newPathName = path.join(folderPath, newName);
+            // fs.rename(pathName, newPathName).then(info => console.log(info));
+          }).catch(ex => {
+            // console.log(`${pathName}: ${ex.message}`)
+          });
+        } else if (stats.isDirectory()) {
+          this.processFolder(pathName);
+        }
+      }).catch(err => {
+        throw err;
+      })
+    });
+  }
+
+  getNameByExif(folderPath, fileName, fileCreateTime) {
+    const isExifFileName = (fileName) => {
+      var re = /[0-9]{14}_.*/g;
+      return re.test(fileName);
     }
 
-    try {
-      new ExifImage({ image: filePathName }, function(error, exifData) {
-        if (error) {
-          // console.log('Error: ' + error.message);
-        } else {
-          // fs.writeFile(path.resolve('info.json'), JSON.stringify(exifData));
-          const dateTime = exifData.exif.DateTimeOriginal;
-          if (dateTime) {
-            const newFileName = dateTime.split(':').join('').split(' ').join('') + '.jpg';
-            // const newFileName = dateTime.split(':').join('-').replace(' ', '_') + '.jpg';
-            // copy(filePathName, path.resolve(dest_path, newFileName));
-            console.log(newFileName);
-          } else {
-            console.log(fileCreateTime);
-          }
-        }
-      });
-    } catch (error) {
-      throw error;
+    console.log(isExifFileName('2012050112154_C501_8504.jpg'));
+    console.log(isExifFileName('20120501112154_C501_8504.jpg'));
+
+    const pathName = path.join(folderPath, fileName);
+
+    if (!/\.(jpg|jpeg|JPG|JPEG)$/.test(pathName)) {
+      return Promise.reject({ message: 'Not an Image' });
+
     }
+
+    return new Promise((resolve, reject) => {
+      new ExifImage({ image: pathName }, function(error, exifData) {
+        if (error) {
+          reject(error);
+          // console.log('Error: ' + error.message);
+        }
+
+        // fs.writeFile(path.resolve('info.json'), JSON.stringify(exifData));
+        const dateTime = exifData && exifData.exif && exifData.exif.DateTimeOriginal;
+        if (dateTime) {
+          const newFileName = dateTime.split(':').join('').split(' ').join('') + '_' + fileName;
+          resolve(newFileName);
+          // copy(pathName, path.resolve(dest_path, newFileName));
+        }
+
+        reject({ message: 'No Time in Exif' });
+      });
+    });
   }
 
   // Copy file
