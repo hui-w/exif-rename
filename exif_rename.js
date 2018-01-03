@@ -3,6 +3,11 @@ const fs = require('fs');
 const path = require('path');
 const ExifImage = require('./lib/exif').ExifImage;
 
+const isExifFileName = (fileName) => {
+  var re = /[0-9]{14}_.*/g;
+  return re.test(fileName);
+}
+
 class ExifRename {
   constructor(pathName) {
     this.processFolder(pathName);
@@ -60,12 +65,17 @@ class ExifRename {
       const pathName = path.join(folderPath, fileName);
       this.statFile(pathName).then(stats => {
         if (stats.isFile()) {
-          this.getNameByExif(folderPath, fileName, stats.ctime).then(newName => {
-            const newPathName = path.join(folderPath, newName);
-            // fs.rename(pathName, newPathName).then(info => console.log(info));
-          }).catch(ex => {
-            // console.log(`${pathName}: ${ex.message}`)
-          });
+          this.getNameByExif(folderPath, fileName, stats.ctime).then(
+            newName => {
+              const newPathName = path.join(folderPath, newName);
+              fs.rename(pathName, newPathName);
+            },
+            info => {
+              console.log(info.message)
+            }).catch(
+            ex => {
+              // console.log(`${pathName}: ${ex.message}`)
+            });
         } else if (stats.isDirectory()) {
           this.processFolder(pathName);
         }
@@ -76,18 +86,14 @@ class ExifRename {
   }
 
   getNameByExif(folderPath, fileName, fileCreateTime) {
-    const isExifFileName = (fileName) => {
-      var re = /[0-9]{14}_.*/g;
-      return re.test(fileName);
+    if (isExifFileName(fileName)) {
+      return Promise.reject({ message: 'Already renamed.' });
     }
-
-    console.log(isExifFileName('2012050112154_C501_8504.jpg'));
-    console.log(isExifFileName('20120501112154_C501_8504.jpg'));
 
     const pathName = path.join(folderPath, fileName);
 
     if (!/\.(jpg|jpeg|JPG|JPEG)$/.test(pathName)) {
-      return Promise.reject({ message: 'Not an Image' });
+      return Promise.reject({ message: 'Not an image.' });
 
     }
 
@@ -106,7 +112,7 @@ class ExifRename {
           // copy(pathName, path.resolve(dest_path, newFileName));
         }
 
-        reject({ message: 'No Time in Exif' });
+        reject({ message: 'No time found in the Exif.' });
       });
     });
   }
