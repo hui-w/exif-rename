@@ -9,7 +9,8 @@ const isExifFileName = (fileName) => {
 }
 
 class ExifRename {
-  constructor(pathName) {
+  constructor(pathName, restore) {
+    this.restore = restore;
     this.processFolder(pathName);
   }
 
@@ -65,17 +66,26 @@ class ExifRename {
       const pathName = path.join(folderPath, fileName);
       this.statFile(pathName).then(stats => {
         if (stats.isFile()) {
-          this.getNameByExif(folderPath, fileName, stats.ctime).then(
-            newName => {
-              const newPathName = path.join(folderPath, newName);
+          if (this.restore) {
+            // Restore file name
+            if (isExifFileName(fileName)) {
+              const newPathName = path.join(folderPath, fileName.substring(15));
               fs.rename(pathName, newPathName);
-            },
-            info => {
-              console.log(info.message)
-            }).catch(
-            ex => {
-              // console.log(`${pathName}: ${ex.message}`)
-            });
+            }
+          } else {
+            // Rename file
+            this.getNameByExif(folderPath, fileName, stats.ctime).then(
+              newName => {
+                const newPathName = path.join(folderPath, newName);
+                fs.rename(pathName, newPathName);
+              },
+              info => {
+                console.log(info.message)
+              }).catch(
+              ex => {
+                // console.log(`${pathName}: ${ex.message}`)
+              });
+          }
         } else if (stats.isDirectory()) {
           this.processFolder(pathName);
         }
