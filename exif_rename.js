@@ -8,6 +8,19 @@ const isExifFileName = (fileName) => {
   return re.test(fileName);
 }
 
+const getFriendlyError = (folderPath, fileName, errorMsg) => {
+  let fileInfo;
+
+  if (folderPath === __dirname) {
+    fileInfo = fileName;
+  } else {
+    const friendlyFlderName = folderPath.substring(__dirname.length + 1);
+    fileInfo = `${friendlyFlderName}/${fileName}`;
+  }
+
+  return `FILE: ${fileInfo}\nINFO: ${errorMsg}\n`;
+}
+
 class ExifRename {
   constructor(pathName, restore) {
     this.restore = restore;
@@ -70,17 +83,17 @@ class ExifRename {
             // Restore file name
             if (isExifFileName(fileName)) {
               const newPathName = path.join(folderPath, fileName.substring(15));
-              fs.rename(pathName, newPathName);
+              fs.rename(pathName, newPathName, () => {});
             }
           } else {
             // Rename file
             this.getNameByExif(folderPath, fileName, stats.ctime).then(
               newName => {
                 const newPathName = path.join(folderPath, newName);
-                fs.rename(pathName, newPathName);
+                fs.rename(pathName, newPathName, () => {});
               },
               info => {
-                console.log(info.message)
+                console.log(getFriendlyError(folderPath, fileName, info.message))
               }).catch(
               ex => {
                 // console.log(`${pathName}: ${ex.message}`)
@@ -97,13 +110,13 @@ class ExifRename {
 
   getNameByExif(folderPath, fileName, fileCreateTime) {
     if (isExifFileName(fileName)) {
-      return Promise.reject({ message: 'Already renamed.' });
+      return Promise.reject({ message: 'The EXIF time is already in the file name.' });
     }
 
     const pathName = path.join(folderPath, fileName);
 
     if (!/\.(jpg|jpeg|JPG|JPEG)$/.test(pathName)) {
-      return Promise.reject({ message: 'Not an image.' });
+      return Promise.reject({ message: 'The file is not an image.' });
 
     }
 
