@@ -8,8 +8,8 @@
   },
   "scripts": {
     "start": "node rename.js",
-    "rename": "node rename.js",
-    "restore": "node restore.js"
+    "exif-rename": "node exif-rename.js",
+    "exif-restore": "node exif-restore.js"
   },
   "repository": {
     "type": "git",
