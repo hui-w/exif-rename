@@ -1,4 +1,4 @@
-const ExifRename = require('./exif_rename');
+const FolderTraversal = require('./folder_traversal');
 const fs = require('fs');
 const path = require('path');
 
@@ -19,7 +19,7 @@ const fileProcessor = (folderPath, fileName) => {
 // To rename photos with exif date time
 try {
   const filePath = process.argv.length === 3 ? process.argv[2] : __dirname;
-  new ExifRename(filePath, fileProcessor);
+  new FolderTraversal(filePath, fileProcessor);
 } catch (error) {
   console.log('Main Error: ' + error.message);
 }

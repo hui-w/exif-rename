@@ -15,7 +15,7 @@ const getFriendlyError = (folderPath, fileName, errorMsg) => {
   return `FILE: ${fileInfo}\nINFO: ${errorMsg}\n`;
 }
 
-class ExifRename {
+class FolderTraversal {
   constructor(pathName, fileProcessor) {
     this.fileProcessor = fileProcessor;
     this.processFolder(pathName);
@@ -94,4 +94,4 @@ class ExifRename {
   }
 }
 
-module.exports = ExifRename;
+module.exports = FolderTraversal;
