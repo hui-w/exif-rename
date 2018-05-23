@@ -2,7 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const getFriendlyError = (folderPath, fileName, errorMsg) => {
+const getFriendlyError = (folderPath, fileName, msg) => {
   let fileInfo;
 
   if (folderPath === __dirname) {
@@ -12,7 +12,7 @@ const getFriendlyError = (folderPath, fileName, errorMsg) => {
     fileInfo = `${friendlyFlderName}/${fileName}`;
   }
 
-  return `FILE: ${fileInfo}\nINFO: ${errorMsg}\n`;
+  return `FILE: ${fileInfo}\nINFO: ${msg}\n`;
 }
 
 class FolderTraversal {
@@ -74,8 +74,8 @@ class FolderTraversal {
       this.statFile(pathName).then(stats => {
         if (stats.isFile()) {
           this.fileProcessor(folderPath, fileName).then(
-            () => {},
-            ({folderPath, fileName, msg}) => console.log(getFriendlyError(folderPath, fileName, msg)));
+            ({ folderPath, fileName, msg }) => console.log(getFriendlyError(folderPath, fileName, msg)),
+            ({ folderPath, fileName, msg }) => console.log(getFriendlyError(folderPath, fileName, msg)));
         } else if (stats.isDirectory()) {
           this.processFolder(pathName);
         }

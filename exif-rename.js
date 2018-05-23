@@ -48,7 +48,7 @@ const fileProcessor = (folderPath, fileName) => {
         const pathName = path.join(folderPath, fileName);
         const newPathName = path.join(folderPath, newName);
         fs.rename(pathName, newPathName, () => {
-          resolve({folderPath, fileName});
+          resolve({folderPath, fileName, msg: 'Renamed'});
         });
       },
       info => {
