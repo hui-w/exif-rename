@@ -41,19 +41,23 @@ const getNameByExif = (folderPath, fileName) => {
 }
 
 const fileProcessor = (folderPath, fileName) => {
-  // Rename file
-  getNameByExif(folderPath, fileName).then(
-    newName => {
-      const pathName = path.join(folderPath, fileName);
-      const newPathName = path.join(folderPath, newName);
-      fs.rename(pathName, newPathName, () => {});
-    },
-    info => {
-      console.log(getFriendlyError(folderPath, fileName, info.message))
-    }).catch(
-    ex => {
-      // console.log(`${pathName}: ${ex.message}`)
-    });
+  return new Promise((resolve, reject) => {
+    // Rename file
+    getNameByExif(folderPath, fileName).then(
+      newName => {
+        const pathName = path.join(folderPath, fileName);
+        const newPathName = path.join(folderPath, newName);
+        fs.rename(pathName, newPathName, () => {
+          resolve({folderPath, fileName});
+        });
+      },
+      info => {
+        reject({folderPath, fileName, msg: info.message});
+      }).catch(
+      ex => {
+        reject({folderPath, fileName, msg: ex.message});
+      });
+  })
 }
 
 // To rename photos with exif date time

@@ -8,12 +8,16 @@ const isExifFileName = (fileName) => {
 }
 
 const fileProcessor = (folderPath, fileName) => {
-  // Restore file name
-  if (isExifFileName(fileName)) {
-    const pathName = path.join(folderPath, fileName);
-    const newPathName = path.join(folderPath, fileName.substring(15));
-    fs.rename(pathName, newPathName, () => {});
-  }
+  return new Promise((resolve, reject) => {
+    // Restore file name
+    if (isExifFileName(fileName)) {
+      const pathName = path.join(folderPath, fileName);
+      const newPathName = path.join(folderPath, fileName.substring(15));
+      fs.rename(pathName, newPathName, () => {
+        resolve({folderPath, fileName})
+      });
+    }
+  })
 }
 
 // To rename photos with exif date time

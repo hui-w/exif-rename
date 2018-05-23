@@ -73,7 +73,9 @@ class FolderTraversal {
       const pathName = path.join(folderPath, fileName);
       this.statFile(pathName).then(stats => {
         if (stats.isFile()) {
-          this.fileProcessor(folderPath, fileName);
+          this.fileProcessor(folderPath, fileName).then(
+            () => {},
+            ({folderPath, fileName, msg}) => console.log(getFriendlyError(folderPath, fileName, msg)));
         } else if (stats.isDirectory()) {
           this.processFolder(pathName);
         }
