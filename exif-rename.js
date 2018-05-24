@@ -24,7 +24,6 @@ const getNameByExif = (folderPath, fileName) => {
     new ExifImage({ image: pathName }, function(error, exifData) {
       if (error) {
         reject(error);
-        // console.log('Error: ' + error.message);
       }
 
       // fs.writeFile(path.resolve('info.json'), JSON.stringify(exifData));
