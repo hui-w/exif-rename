@@ -2,13 +2,13 @@
 const fs = require('fs');
 const path = require('path');
 
-const getFridnelyInfo = (folderPath, fileName, msg) => {
+const getFridnelyInfo = (startPath, folderPath, fileName, msg) => {
   let fileInfo;
 
-  if (folderPath === __dirname) {
+  if (folderPath === startPath) {
     fileInfo = fileName;
   } else {
-    const friendlyFlderName = folderPath.substring(__dirname.length + 1);
+    const friendlyFlderName = folderPath.substring(startPath.length + 1);
     fileInfo = `${friendlyFlderName}/${fileName}`;
   }
 
@@ -17,6 +17,7 @@ const getFridnelyInfo = (folderPath, fileName, msg) => {
 
 class FolderTraversal {
   constructor(pathName, fileProcessor) {
+    this.startPath = pathName;
     this.fileProcessor = fileProcessor;
     this.processFolder(pathName);
   }
@@ -75,10 +76,10 @@ class FolderTraversal {
         if (stats.isFile()) {
           this.fileProcessor(folderPath, fileName)
             .then(
-              ({ folderPath, fileName, msg }) => console.log(getFridnelyInfo(folderPath, fileName, msg))
+              ({ folderPath, fileName, msg }) => console.log(getFridnelyInfo(this.startPath, folderPath, fileName, msg))
             )
             .catch(
-              ({ folderPath, fileName, msg }) => console.log(getFridnelyInfo(folderPath, fileName, msg))
+              ({ folderPath, fileName, msg }) => console.log(getFridnelyInfo(this.startPath, folderPath, fileName, msg))
             );
         } else if (stats.isDirectory()) {
           this.processFolder(pathName);
