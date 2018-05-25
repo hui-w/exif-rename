@@ -1,11 +1,7 @@
-const FolderTraversal = require('./folder_traversal');
 const fs = require('fs');
 const path = require('path');
-
-const isExifFileName = (fileName) => {
-  var re = /[0-9]{14}_.*/g;
-  return re.test(fileName);
-}
+const FolderTraversal = require('./folder_traversal');
+const { isExifFileName, getNameByExif } = require('./utils/exif')
 
 const fileProcessor = (folderPath, fileName) => {
   return new Promise((resolve, reject) => {
@@ -14,7 +10,7 @@ const fileProcessor = (folderPath, fileName) => {
       const pathName = path.join(folderPath, fileName);
       const newPathName = path.join(folderPath, fileName.substring(15));
       fs.rename(pathName, newPathName, () => {
-        resolve({folderPath, fileName, msg: 'Restored'})
+        resolve({ folderPath, fileName, msg: 'Restored' })
       });
     }
   })
