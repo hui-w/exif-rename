@@ -8,6 +8,7 @@
   },
   "scripts": {
     "start": "node rename.js",
+    "exif-preview": "node exif-preview.js",
     "exif-rename": "node exif-rename.js",
     "exif-restore": "node exif-restore.js"
   },

@@ -3,14 +3,8 @@ const fs = require('fs');
 const path = require('path');
 
 const getFridnelyInfo = (startPath, folderPath, fileName, msg) => {
-  let fileInfo;
-
-  if (folderPath === startPath) {
-    fileInfo = fileName;
-  } else {
-    const friendlyFlderName = folderPath.substring(startPath.length + 1);
-    fileInfo = `${friendlyFlderName}/${fileName}`;
-  }
+  const filePathName = path.resolve(folderPath, fileName);
+  const fileInfo = filePathName.substring(startPath.length);
 
   return `FILE: ${fileInfo}\nINFO: ${msg}\n`;
 }
