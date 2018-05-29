@@ -70,10 +70,10 @@ class FolderTraversal {
         if (stats.isFile()) {
           this.fileProcessor(folderPath, fileName)
             .then(
-              ({ folderPath, fileName, msg }) => console.log(getFridnelyInfo(this.startPath, folderPath, fileName, msg))
+              ({ folderPath, fileName, message }) => console.log(getFridnelyInfo(this.startPath, folderPath, fileName, message))
             )
             .catch(
-              ({ folderPath, fileName, msg }) => console.log(getFridnelyInfo(this.startPath, folderPath, fileName, msg))
+              ({ folderPath, fileName, message }) => console.log(getFridnelyInfo(this.startPath, folderPath, fileName, message))
             );
         } else if (stats.isDirectory()) {
           this.processFolder(pathName);

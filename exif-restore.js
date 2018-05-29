@@ -8,15 +8,18 @@ const fileProcessor = (folderPath, fileName) => {
     // Restore file name
     if (isExifFileName(fileName)) {
       const pathName = path.join(folderPath, fileName);
-      const newPathName = path.join(folderPath, fileName.substring(15));
+      const newName = fileName.substring(15);
+      const newPathName = path.join(folderPath, newName);
       fs.rename(pathName, newPathName, () => {
-        resolve({ folderPath, fileName, msg: 'Restored' })
+        resolve({ folderPath, fileName, message: `Restored to ${newName}` })
       });
+    } else {
+      // reject({ folderPath, fileName, message: `No need to restore` });
     }
   })
 }
 
-// To rename photos with exif date time
+// To restore file names renamed with EXIF
 try {
   const filePath = process.argv.length === 3 ? process.argv[2] : __dirname;
   new FolderTraversal(filePath, fileProcessor);

@@ -6,20 +6,17 @@ const fileProcessor = (folderPath, fileName) => {
   return new Promise((resolve, reject) => {
     // Rename file
     getNameByExif(folderPath, fileName).then(
-      newName => {
-        const pathName = path.join(folderPath, fileName);
-        resolve({ folderPath, fileName, msg: newName });
-      },
       info => {
-        reject({ folderPath, fileName, msg: info.message });
+        const pathName = path.join(folderPath, fileName);
+        resolve({ ...info, message: `Will rename to ${info.message}` });
       }).catch(
       ex => {
-        reject({ folderPath, fileName, msg: ex.message });
+        // reject(ex);
       });
   })
 }
 
-// To rename photos with exif date time
+// To preview names with exif date time
 try {
   const filePath = process.argv.length === 3 ? process.argv[2] : __dirname;
   new FolderTraversal(filePath, fileProcessor);

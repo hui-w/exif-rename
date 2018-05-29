@@ -5,20 +5,17 @@ const { isExifFileName, getNameByExif } = require('./utils/exif')
 
 const fileProcessor = (folderPath, fileName) => {
   return new Promise((resolve, reject) => {
-    // Rename file
     getNameByExif(folderPath, fileName).then(
-      newName => {
+      info => {
         const pathName = path.join(folderPath, fileName);
+        const newName = info.message;
         const newPathName = path.join(folderPath, newName);
         fs.rename(pathName, newPathName, () => {
-          resolve({ folderPath, fileName, msg: 'Renamed' });
+          resolve({ ...info, message: `Renamed to ${newName}` });
         });
-      },
-      info => {
-        reject({ folderPath, fileName, msg: info.message });
       }).catch(
       ex => {
-        reject({ folderPath, fileName, msg: ex.message });
+        // reject(ex);
       });
   })
 }
